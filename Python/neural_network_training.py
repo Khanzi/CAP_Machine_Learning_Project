@@ -63,3 +63,4 @@ predictions = mlp.predict(X_test)
 #%%
 confusion_matrix(y_test, predictions)
 print(classification_report(y_test,predictions))
+print("Accuracy:",metrics.accuracy_score(y_test, predictions))
