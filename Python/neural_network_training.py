@@ -52,7 +52,7 @@ X_test = scaler.transform(X_test)
 
 #%%
 from sklearn.neural_network import MLPClassifier
-mlp = MLPClassifier(hidden_layer_sizes=(40),max_iter=50000)
+mlp = MLPClassifier(hidden_layer_sizes=(30),max_iter=500000)
 
 mlp.fit(X_train, y_train)
 
@@ -64,3 +64,6 @@ predictions = mlp.predict(X_test)
 confusion_matrix(y_test, predictions)
 print(classification_report(y_test,predictions))
 print("Accuracy:",metrics.accuracy_score(y_test, predictions))
+
+
+#%%

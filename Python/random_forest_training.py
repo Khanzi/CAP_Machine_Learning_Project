@@ -42,7 +42,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.80, random
 
 #%%
 #Create a Gaussian Classifier
-clf=RandomForestClassifier(n_estimators=1000)
+clf=RandomForestClassifier(n_estimators=100000)
 
 #Train the model using the training sets y_pred=clf.predict(X_test)
 clf.fit(X_train,y_train)
@@ -53,5 +53,9 @@ y_pred=clf.predict(X_test)
 
 #%%
 from sklearn import metrics
+print(classification_report(y_test,y_pred))
 print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
 
+
+
+#%%

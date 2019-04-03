@@ -1,0 +1,139 @@
+---
+title: "Project Milestone 3"
+author: "Kahlil Wehmeyer, Richard Cruz, Luke Rhon, Diego De La Torre, and Jackie Gauthier"
+date: "3/14/2019"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+```
+
+```{python, include=FALSE}
+# Libraries
+import tweepy
+import pandas as pd
+import json
+from textblob import TextBlob
+from IPython.display import display, HTML
+
+# Authentication
+
+CONSUMER_KEY ='Lp7p3I3Yc35DUg5x8ToGUxVtV'
+CONSUMER_SECRET = 'Ltm3JEJTnT7w1pY12FjQvOVwi1WWt5rFowD1gqw2fcDjY5HZAs'
+
+ACCESS_KEY = '724658688061902848-UPUXPU4H8SlSWe7Z0mh8GJXSdfQm9FM'
+ACCESS_SECRET = 'ujK7JhUOf7o6Lva093YGT6TVComkrplT7oUJHOInolTxm'
+
+
+# Authenticate 
+auth = tweepy.OAuthHandler(consumer_key=CONSUMER_KEY, 
+    consumer_secret=CONSUMER_SECRET)
+
+#Connect to the Twitter API using the authentication
+api = tweepy.API(auth)
+
+```
+
+
+# Problem
+
+Social media has a very important role in society. Companies utilize social media to advertise their products and address customer service issues. Also, companies gauge public opinion of their products and services through social media. A person’s opinion is freely and honestly stated on any number of social media platforms for the world to see.
+	
+People often use a platform like twitter as an outlet. They would have an opinion or a fact they would like to share, and proceed to post it on their profile. Getting an opinion from a customer about their service is something that companies usually must spend considerable effort and money to achieve. Even then, a solicited response might be biased, or be impossible to achieve if the customer refuses. Twitter is a free source of sentiment waiting to be collected by anyone with the tools.
+	
+There is a space for a twitter sentiment analyzer to be implemented. While there may be some companies already polling their companies public opinion from social media, this information isn’t readily available for anyone to utilize. Anyone may read information given to the public by journalists on the news, but there isn’t a well known, working service that complies sentiment and gives a rating on whatever subject desired.
+
+# Solution
+
+
+The Twitter Sentiment Analyzer is a tool that will predict the sentiment of a specific tweet after training on  a training set of labeled tweets. The goal is to correctly label each new tweet with the correct label. These new and recent tweets will be used to gauge the public sentiment for a specific topic. All this data will be collected and displayed in a format specific to our users.
+	
+The Sentiment Score is an arbitrary score the project team is developing to determine public sentiment toward a specific subject. This score will take in account the amount of favorites and retweets a tweet has, the content of each tweet, and whether or not the origin of the tweet is verified. Whatever data is collected on a specific subject will be weighted and graded to develop a specific number, this is the Sentiment Score.
+
+This method of grading a subject is very simple to do through a twitter API (Application Programming Interface). Using the hashtag for a whichever subject we are attempting to query, we may obtain a limited amount of tweets to use for training data. The amount of tweets is limited by the specific API we use. It is possible to maintain a separate catalogue of tweets as a training data set.
+	
+# Features
+
+# API
+
+This is how we connect to the API
+
+```python
+# Authentication
+
+CONSUMER_KEY ='NOT'
+CONSUMER_SECRET = 'TODAY'
+
+ACCESS_KEY = 'MY'
+ACCESS_SECRET = 'FRIEND'
+
+
+# Authenticate 
+auth = tweepy.OAuthHandler(consumer_key=CONSUMER_KEY, 
+    consumer_secret=CONSUMER_SECRET)
+
+#Connect to the Twitter API using the authentication
+api = tweepy.API(auth)
+```
+
+The following is a function we created to map the JSON output of `api.search("query")` to a `pandas` data frame.
+
+```{python}
+def search(query):
+    
+    tweets = api.search(q=query)
+
+    DataSet = pd.DataFrame()
+
+    DataSet['tweetID'] = [tweet.id for tweet in tweets]
+    DataSet['tweetText'] = [tweet.text for tweet in tweets]
+    DataSet['tweetRetweetCt'] = [tweet.retweet_count for tweet 
+    in tweets]
+    DataSet['tweetFavoriteCt'] = [tweet.favorite_count for tweet 
+    in tweets]
+    DataSet['tweetSource'] = [tweet.source for tweet in tweets]
+    DataSet['tweetCreated'] = [tweet.created_at for tweet in tweets]
+
+
+    DataSet['userID'] = [tweet.user.id for tweet in tweets]
+    DataSet['userScreen'] = [tweet.user.screen_name for tweet 
+    in tweets]
+    DataSet['userName'] = [tweet.user.name for tweet in tweets]
+    DataSet['userCreateDt'] = [tweet.user.created_at for tweet 
+    in tweets]
+    DataSet['userDesc'] = [tweet.user.description for tweet in tweets]
+    DataSet['userFollowerCt'] = [tweet.user.followers_count for tweet 
+    in tweets]
+    DataSet['userFriendsCt'] = [tweet.user.friends_count for tweet 
+    in tweets]
+    DataSet['userLocation'] = [tweet.user.location for tweet in tweets]
+    DataSet['userTimezone'] = [tweet.user.time_zone for tweet 
+    in tweets]
+
+    return DataSet
+
+```
+
+Here is an example query using the custom search function and it's related output.
+```{python}
+example = search("Uganda").head(5)
+display(example)
+```
+
+
+# Clean Data
+
+# Training Data
+
+The project team has collected a set of tweets about Youtube, Apple, Tesla, Florida Polytechnic, Wells Fargo, and Facebook. Each member is meant to go through this data and label them with one of four labels. After this is done the team will settle on a label for each. There is a lot of data to go through, and the team is actively working on this aspect of the project. The four labels we are using for the data is as follows:
+
+- Positive: The tweet is a positive one. The user may be complimenting the product or service.
+- Negative: The tweet has a negative tone. This may be an insult, a bad review of the product, or simply stating they don’t like the company.
+- Neutral: The poster doesn’t mind anyway. Could be informative tweets, or just tweets that don’t lean towards positive or negative.
+- Issue: Whenever there is a technical problem and a tweet is posted toward the subject with a solvable grievance. This does not include a technical problem with insults toward the subject, those count as negative.
+
+
