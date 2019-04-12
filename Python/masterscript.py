@@ -29,12 +29,12 @@ sentimenter = SentimentIntensityAnalyzer()
 #%%
 def search(query):
     
-    tweets = api.search(q=query, count=1000)
+    tweets = api.search(q=query, lang = 'en', tweet_mode='extended', count = 200)
 
     DataSet = pd.DataFrame()
 
     DataSet['tweetID'] = [tweet.id for tweet in tweets]
-    DataSet['tweetText'] = [tweet.text for tweet in tweets]
+    DataSet['tweetText'] = [tweet.full_text for tweet in tweets]
     DataSet['tweetRetweetCt'] = [tweet.retweet_count for tweet 
     in tweets]
     DataSet['tweetFavoriteCt'] = [tweet.favorite_count for tweet 
@@ -57,7 +57,6 @@ def search(query):
     DataSet['userLocation'] = [tweet.user.location for tweet in tweets]
     DataSet['userTimezone'] = [tweet.user.time_zone for tweet 
     in tweets]
-    DataSet['lang'] = [tweet.lang for tweet in tweets]
 
     return DataSet
 
@@ -86,26 +85,42 @@ def prepare(data):
     data['neuSentiment'] = data['tweetText'].apply(sent_neutral)
     data['posSentiment'] = data['tweetText'].apply(sent_positive)
     data['comSentiment'] = data['tweetText'].apply(sent_compound)
-    data_english = data.loc[data['lang'] == "en"]
-    return(data_english[['tweetText','tweetCreated','tweetLength','negSentiment','neuSentiment','posSentiment','comSentiment']])
+    return(data[['tweetText','tweetCreated','tweetLength','negSentiment','neuSentiment','posSentiment','comSentiment']])
 
 
 #%%
 p = search("Test")
-p = prepare(p)
-pandas_profiling.ProfileReport(p)
+p
+
 
 #%%
 # Youtube, Apple, Tesla, Florida Polytechnic, Wells Fargo, and Facebook
-youtube =  prepare(search("@Youtube"))
-apple = prepare(search("@Apple"))
+youtube =  prepare(search("@TeamYouTube"))
+apple = prepare(search("@AppleSupport"))
 flpoly =prepare(search("@FLPolyU"))
 wellsfargo = prepare(search("@WellsFargo"))
-facebook = prepare(search("@Apple"))
-tesla = prepare(search("@Tesla"))
-
-frames = [youtube,apple,flpoly,wellsfargo,facebook, tesla]
-result = pd.concat(frames)
+facebook = prepare(search("@Facebook"))
+tesla = prepare(search("@TeslaSupport"))
 
 
 #%%
+youtube['Company'] = "Youtube"
+apple['Company'] = "Apple"
+flpoly['Company'] = "Florida Poly"
+wellsfargo['Company'] = "Wells Fargo"
+facebook['Company'] = "Facebook"
+tesla['Company'] = "Tesla"
+
+
+#%%
+writer = pd.ExcelWriter('Data\labeling_individual.xlsx', engine='xlsxwriter')
+
+youtube.to_excel(writer, sheet_name = "Youtube")
+apple.to_excel(writer, sheet_name = "Apple")
+flpoly.to_excel(writer, sheet_name = "Florida Poly")
+wellsfargo.to_excel(writer, sheet_name = "Wells Fargo")
+facebook.to_excel(writer, sheet_name = "Facebook")
+tesla.to_excel(writer, sheet_name = "Tesla")
+
+#%%
+writer.save()
